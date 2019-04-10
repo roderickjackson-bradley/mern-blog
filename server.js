@@ -13,9 +13,13 @@ const port =  process.env.PORT || 8102
 const mongoose = require('mongoose')
 const createError = require('http-errors')
 
-// Body parser middleware
-app.use(bodyParser.urlencoded({extended: false}))
-app.use(bodyParser.json())
+// Bodyparser middleware
+app.use(
+  bodyParser.urlencoded({
+    extended: false
+  })
+);
+app.use(bodyParser.json());
 
 // DB Config
 const db = require('./config/key').mongoURI
@@ -26,6 +30,8 @@ mongoose
   .then(() => console.log(`Connected to MongoDB Homie!`))
   .catch((err) => console.log(err))
 
+
+
 // app.use(express.json())
 // app.use(express.urlencoded({extended: false}))
 
@@ -35,6 +41,10 @@ app.get('/', (req, res) => res.send(`Hello Homie`))
 app.use('/api/users', users)
 app.use('/api/profile', profile)
 app.use('/api/posts', posts)
+
+// Body parser middleware
+// app.use(bodyParser.urlencoded({extended: false}))
+// app.use(bodyParser.json())
 
 // Passport Config
 /*
