@@ -6,12 +6,13 @@ const users = require('./routes/api/users')
 const profile = require('./routes/api/profile')
 const posts = require('./routes/api/posts')
 const app = express()
-const port =  process.env.PORT || 8102
+const port = 8102
 
 // Dependencies 
 //const passport = require('passport')
 const mongoose = require('mongoose')
 const createError = require('http-errors')
+const passport = require('passport')
 
 // Bodyparser middleware
 app.use(
@@ -32,10 +33,12 @@ mongoose
 
 
 
-// app.use(express.json())
-// app.use(express.urlencoded({extended: false}))
 
-app.get('/', (req, res) => res.send(`Hello Homie`))
+// Passport middleware
+app.use(passport.initialize())
+
+// Passport Config
+require('./config/passport')(passport)
 
 // Routes
 app.use('/api/users', users)

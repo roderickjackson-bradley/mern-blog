@@ -3,6 +3,7 @@ const router = express.Router()
 const gravatar = require('gravatar')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const passport = require('passport')
 const keys = require('../../config/key')
 
 
@@ -14,7 +15,7 @@ const User = require('../../models/user')
 // @access  Public
 router.get('/test', (req, res) => res.json({msg: "Users Works"}))
 
-// @route   GET api/users/register
+// @route   Post api/users/register
 // @desc    Register user
 // @access  Public
 router.post('/register', (req, res) => {
@@ -61,7 +62,7 @@ router.post('/register', (req, res) => {
   })
 })
 
-// @route   GET api/users/login
+// @route   Post api/users/login
 // @desc    Login User / Returning JWT Token
 // @access  Public
 router.post('/login', (req, res) => {
@@ -89,17 +90,32 @@ router.post('/login', (req, res) => {
             }
             // Sign Token
             jwt.sign(payload, keys.secretOrKey, 
-              {expiresIn: 3600}, (err, token) => {
+              // {expiresIn: 31556926},  // 1 year in seconds
+              (err, token) => {
                 res.json({
                   success: true,
                   token: 'Bearer' + token
                 })
                })
           }else{
-            return res.status(400).json({password: 'Password incorrect'})
+            return res
+              .status(400)
+              .json({password: 'Password incorrect'})
           }
         })
     })
+})
+
+// @route   GET api/users/current
+// @desc    Return current user
+// @access  Private 
+router.get('/current', passport.authenticate('jwt', {session: false}), 
+    (req, res) => {
+      res.json({
+        id: req.user.id,
+        name: req.user.name,
+        email: req.user.email
+      })
 })
 
 module.exports = router
