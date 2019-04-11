@@ -6,6 +6,9 @@ const jwt = require('jsonwebtoken')
 const passport = require('passport')
 const keys = require('../../config/key')
 
+// Load Input Validation
+const validateRegisterInput = require('../../validations/register')
+const validateLoginInput = require('../../validations/login')
 
 // Load User model
 const User = require('../../models/user')
@@ -19,10 +22,19 @@ router.get('/test', (req, res) => res.json({msg: "Users Works"}))
 // @desc    Register user
 // @access  Public
 router.post('/register', (req, res) => {
+   // Form validation
+   const { errors, isValid } = validateRegisterInput(req.body);
+
+   // Check validation
+   if (!isValid) {
+     return res.status(400).json(errors);
+   }
+
   User.findOne({email: req.body.email})
   .then(user => {
     if(user){
-      return res.status(400).json({email: 'Email already exists'})
+      errors.email = 'Email already exists'
+      return res.status(400).json(errors)
     }else{
       // Search and fetch users avatar or 
       // return generic avatar if user doesn't have one.
@@ -70,12 +82,21 @@ router.post('/login', (req, res) => {
   const email = req.body.email
   const password = req.body.password
 
+     // Form validation
+     const { errors, isValid } = validateRegisterInput(req.body);
+
+     // Check validation
+     if (!isValid) {
+       return res.status(400).json(errors);
+     }
+
   // Find user by email
   User.findOne({email})
     .then(user => {
       // Check for user
       if(!user){
-        return res.status(404).json({email: 'Use not found'})
+        errors.email = 'Use not found'
+        return res.status(404).json(email)
       }
       // Check password
       bcrypt.compare(password, user.password)
