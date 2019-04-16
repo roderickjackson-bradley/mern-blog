@@ -83,7 +83,7 @@ router.post('/login', (req, res) => {
   const password = req.body.password
 
      // Form validation
-     const { errors, isValid } = validateRegisterInput(req.body);
+     const { errors, isValid } = validateLoginInput(req.body);
 
      // Check validation
      if (!isValid) {
