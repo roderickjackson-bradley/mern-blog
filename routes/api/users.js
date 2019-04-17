@@ -170,7 +170,7 @@ router.post('/unfollow/:id', passport.authenticate('jwt', { session: false }), (
   // The passport.authenticate() function will return the current user
   // Set the currentUser variable to req.user
   let currentUser = req.user
-  // Find the user you want to follow by ID
+  // Find the user you want to unfollow by ID
   User.findById(req.params.id)
   .then(user => {
     // Create removeIndex

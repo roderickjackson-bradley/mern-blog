@@ -13,6 +13,7 @@ const port = 8102
 const mongoose = require('mongoose')
 const createError = require('http-errors')
 const passport = require('passport')
+const path = require('path')
 
 // Bodyparser middleware
 app.use(
@@ -44,6 +45,15 @@ require('./config/passport')(passport)
 app.use('/api/users', users)
 app.use('/api/profile', profile)
 app.use('/api/posts', posts)
+
+// Server static assets if in production
+if(process.env.NODE_ENV === 'production'){
+  app.use(express.static('client/build'))
+
+  app.get('*', (res, req) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+  })
+}
 
 // Body parser middleware
 // app.use(bodyParser.urlencoded({extended: false}))

@@ -9,6 +9,7 @@ const Profile = require('../../models/profile')
 
 // Validation
 const validatePostInput = require('../../validations/post')
+const validateCommentInput = require('../../validations/comment')
 
 // @route   GET api/posts
 // @desc    GET all posts
@@ -150,5 +151,34 @@ router.post('/unlike/:id', passport.authenticate('jwt', { session: false }), (re
         .catch(err => console.log(err))
     })
 });
+
+// @route   POST api/posts/comment/:id
+// @desc    Add comment
+// @access  Private
+router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  const { errors, isValid } = validateCommentInput(req.body);
+  // Check Validation
+  if (!isValid) {
+    // If any errors, send 400 with errors object
+    return res.status(400).json(errors);
+  }
+  Post.findById(req.params.id)
+    .then(post => {
+      const newComment = {
+        user: req.user.id,
+        content: req.body.content,
+        author: req.body.author,
+        avatar: req.body.avatar,
+      }
+      // Add to comments Array
+      post.comments.unshift(newComment)
+      
+      post
+      .save()
+      .then(post => res.json(post))
+      .catch(err => console.log(err))
+    })
+
+})
 
 module.exports = router
