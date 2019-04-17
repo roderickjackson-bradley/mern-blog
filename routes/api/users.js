@@ -12,6 +12,8 @@ const validateLoginInput = require('../../validations/login')
 
 // Load User model
 const User = require('../../models/user')
+// Load User model
+const Profile = require('../../models/profile')
 
 // @route   GET api/users/test
 // @desc    Test user route
@@ -137,6 +139,42 @@ router.get('/current', passport.authenticate('jwt', {session: false}),
         name: req.user.name,
         email: req.user.email
       })
+})
+
+// @route   POST api/users/follow/:id
+// @desc    Follow user by id
+// @access  Private
+router.post('/follow/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  let currentUser = req.user
+
+  console.log(currentUser, 'Step 1')
+  User.findById(req.params.id)
+  .then(user => {
+    currentUser.following.unshift(req.params.id)
+    console.log(currentUser.following, 'current following Step 2')
+    console.log(user, 'Step 2')
+    console.log(currentUser, 'current Step 2')
+    let User = currentUser
+    console.log(User, 'Step 4 checking to see if User is current user')
+    User
+      .save()
+      .then(user => res.json(user))
+      .catch(err => console.log(err))
+  }).catch(err => console.log(err))
+});
+// router.post('/follow/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+//   User.findById(req.user.id)
+//   .then(user => res.json(user))
+//   .catch(err => res.status(404).json({userNotFound: 'No user found'}))
+// });
+
+// @route   GET api/posts
+// @desc    GET all posts
+// @access  Public
+router.get('/all', (req, res) => {
+  User.find()
+    .then(users => res.json(users))
+    .catch(err => res.status(404).json({noUsersFound: 'No users were found'}))
 })
 
 module.exports = router
