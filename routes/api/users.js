@@ -145,28 +145,50 @@ router.get('/current', passport.authenticate('jwt', {session: false}),
 // @desc    Follow user by id
 // @access  Private
 router.post('/follow/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  // The passport.authenticate() function will return the current user
+  // Set the currentUser variable to req.user
   let currentUser = req.user
-
-  console.log(currentUser, 'Step 1')
+  // Find the user you want to follow by ID
   User.findById(req.params.id)
   .then(user => {
+    // Push the id of the user that you're following into the following Array
     currentUser.following.unshift(req.params.id)
-    console.log(currentUser.following, 'current following Step 2')
-    console.log(user, 'Step 2')
-    console.log(currentUser, 'current Step 2')
+    // Now set the user variable to currentUser
     let User = currentUser
-    console.log(User, 'Step 4 checking to see if User is current user')
+    // Save the user object since we updated the following Array
     User
       .save()
       .then(user => res.json(user))
       .catch(err => console.log(err))
   }).catch(err => console.log(err))
 });
-// router.post('/follow/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
-//   User.findById(req.user.id)
-//   .then(user => res.json(user))
-//   .catch(err => res.status(404).json({userNotFound: 'No user found'}))
-// });
+
+// @route   POST api/users/unfollow/:id
+// @desc    Unfollow user by id
+// @access  Private
+router.post('/unfollow/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  // The passport.authenticate() function will return the current user
+  // Set the currentUser variable to req.user
+  let currentUser = req.user
+  // Find the user you want to follow by ID
+  User.findById(req.params.id)
+  .then(user => {
+    // Create removeIndex
+    const removeIndex = currentUser.following
+      .map(item => item.user)
+      .indexOf(req.params.id)
+    // Splice array
+    currentUser.following.splice(removeIndex, 1)
+
+    // Now set the user variable to currentUser
+    let User = currentUser
+    // Save the user object since we updated the following Array
+    User
+      .save()
+      .then(user => res.json(user))
+      .catch(err => console.log(err))
+  }).catch(err => console.log(err))
+});
 
 // @route   GET api/posts
 // @desc    GET all posts
